@@ -8,9 +8,10 @@
 
 #define BLYNK_PRINT Serial
 
-char auth[] = "your-api-key";
-char ssid[] = "your-wifi-ssid";
-char pass[] = "your-wifi-pass";
+char auth[] = "your-key";
+char ssid[] = "your-ssid";
+char pass[] = "your-pass";
+
 
 // GPIO where the DS18B20 is connected to
 const int oneWireBus = 26;     
@@ -44,14 +45,13 @@ void setup() {
   Blynk.begin(auth, ssid, pass);
 }
 
-bool threshold = false;
+int threshold = false;
 BLYNK_WRITE(V0)
 {
   threshold = param.asInt();
 }
 
 void loop() {
-  Serial.println("Test1");
   Blynk.run();
 
   sensors.requestTemperatures(); 
@@ -72,14 +72,13 @@ void loop() {
   
   Blynk.virtualWrite(V1, temperature_value);
   Blynk.virtualWrite(V2, analogRead_value);
-
   
   if (threshold > analogRead_value && triggered == false)
   {
     triggered = true;
     Blynk.notify("Please water plants !! Moisture levels are lower than the threshold");
   }
-  else
+  else if (threshold <= analogRead_value)
   {
     triggered = false;
   }
